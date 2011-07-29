@@ -6,8 +6,6 @@
 
 (declare add-data)
 
-(def data {:a 1 :b [1 2] :c {:d 1 :e 2 :f "foo"}})
-
 (defn array? [x]
   (= "array" (goog.typeOf x)))
 
@@ -15,12 +13,13 @@
   (= "object" (goog.typeOf x)))
 
 (defn tree-control []
-  (goog.ui.tree.TreeControl.
-   "root"
-   (.defaultConfig goog.ui.tree.TreeControl)))
+  (goog.ui.tree.TreeControl. "root"
+                             (.defaultConfig goog.ui.tree.TreeControl)))
 
-(defn render [object element-id]
-  (.render object (dom/getElement element-id)))
+(defn render-tree [element-id data]
+  (-> (tree-control)
+      (add-data data)
+      (.render (dom/getElement element-id))))
 
 (defn create-child [node]
   (let [child (.createNode (.getTree node ()) "")]
@@ -69,16 +68,16 @@
 
 (defn render-sample []
   #_(dom/setTextContent (dom/getElement "debug") (pr-str (conj #{:a} :b)))
-  (-> (tree-control)
-      (add-data data)
-      (render "display"))
-  (-> (tree-control)
-      (add-data [1 2
-                 {:a 1}
-                 [:b :c :d]
-                 {:b '(1 2 3)} #{5 3 2} (array 1 2 3)
-                 (tree-control)]
-                )
-      (render "display")))
+  (render-tree "display" {:a 1
+                          :b [1 2]
+                          :c {:d 1
+                              :e 2
+                              :f "foo"}})
+  (render-tree "display"
+               [1 2
+                {:a 1}
+                [:b :c :d]
+                {:b '(1 2 3)} #{5 3 2} (array 1 2 3)
+                (tree-control)]))
 
 (render-sample)
