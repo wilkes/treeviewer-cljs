@@ -22,11 +22,14 @@
 (defn label [node x]
   (.setHtml node (pr-str x)))
 
+(defn short-label [node x]
+  (.setHtml node (str (.substring (pr-str x) 0 10) "...")))
+
 (defn add-map [node m]
   (label node m)
   (doseq [[k v] m]
     (let [child (create-child node)]
-      (label child k)
+      (label child [k v])
       (add-data (create-child child) v))))
 
 (defn add-seq [node l]
