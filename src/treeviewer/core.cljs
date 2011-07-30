@@ -2,7 +2,19 @@
   (:require [goog.dom :as dom]
             [goog.ui.tree.TreeControl :as TreeControl]
             [goog.string :as s]
-            [goog.object :as o]))
+            [goog.object :as o]
+            [goog.debug.DivConsole :as DivConsole]
+            [goog.debug.LogManager :as LogManager]
+            [goog.debug.Trace :as Trace]))
+
+(def debug-console
+  (doto (goog.debug.DivConsole. (dom/getElement "div-console"))
+    (.setCapturing true)))
+
+(def logger (goog.debug.LogManager/getRoot))
+
+(defn info [s]
+  (.info logger s))
 
 (declare add-data)
 
@@ -67,6 +79,7 @@
     node))
 
 (defn render-sample []
+  (info "Start...")
   #_(dom/setTextContent (dom/getElement "debug") (pr-str (conj #{:a} :b)))
   (render-tree "display" {:a 1
                           :b [1 2]
@@ -78,6 +91,7 @@
                 {:a 1}
                 [:b :c :d]
                 {:b '(1 2 3)} #{5 3 2} (array 1 2 3)
-                (tree-control)]))
+                (tree-control)])
+  (info "Done."))
 
 (render-sample)
