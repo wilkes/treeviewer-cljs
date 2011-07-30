@@ -5,7 +5,9 @@
             [goog.object :as o]
             [goog.debug.DivConsole :as DivConsole]
             [goog.debug.LogManager :as LogManager]
-            [goog.debug.Trace :as Trace]))
+            [goog.events :as events]
+            [goog.events.EventType :as event-type]
+            [goog.ui.tree.BaseNode.EventType :as EventType]))
 
 (def debug-console
   (doto (goog.debug.DivConsole. (dom/getElement "div-console"))
@@ -56,11 +58,15 @@
 
 (defn add-object [node obj]
   (label node obj)
-  (o/forEach obj
-             (fn [v k obj]
-               (let [child (create-child node)]
-                 (label child k)
-                 (label (create-child child) v)))))
+  (let [child (create-child node)]
+    (events/listen node
+                   goog.ui.tree.BaseNode.EventType/BEFORE_EXPAND
+                   #(do (info "Exanding")
+                        (o/forEach obj
+                                   (fn [v k obj]
+                                     (label child k)
+                                     (add-data (create-child child) v)))
+                        (info "Expanded")))))
 
 (defn add-seq [node l]
   (label node l)
@@ -68,13 +74,12 @@
     (add-data (create-child node) item)))
 
 (defn add-data [node x]
-  (let [add-to
-        (cond (map? x) add-map
-              (or (sequential? x)
-                  (set? x)
-                  (array? x)) add-seq
-              (object? x) add-object
-              :otherwise label)]
+  (let [add-to (cond (map? x) add-map
+                     (or (sequential? x)
+                         (set? x)
+                         (array? x)) add-seq
+                     (object? x) add-object
+                     :otherwise label)]
     (add-to node x)
     node))
 
