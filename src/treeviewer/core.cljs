@@ -1,22 +1,10 @@
 (ns treeviewer.core
-  (:require [goog.dom :as dom]
-            [goog.ui.tree.TreeControl :as TreeControl]
-            [goog.string :as s]
+  (:require [clojure.browser.dom :as cdom]
+            [clojure.browser.event :as event]
             [goog.object :as o]
-            [goog.debug.DivConsole :as DivConsole]
-            [goog.debug.LogManager :as LogManager]
-            [goog.events :as events]
+            [goog.string :as s]
             [goog.ui.tree.BaseNode.EventType :as EventType]
-            [cljs.reader :as reader]))
-
-(def debug-console
-  (doto (goog.debug.DivConsole. (dom/$ "div-console"))
-    (.setCapturing true)))
-
-(def logger (goog.debug.LogManager/getRoot))
-
-(defn info [& s]
-  (.info logger (apply str s)))
+            [goog.ui.tree.TreeControl :as TreeControl]))
 
 (declare add-data)
 
@@ -31,11 +19,11 @@
                              (.defaultConfig goog.ui.tree.TreeControl)))
 
 (defn render [component element-id]
-  (.render component (dom/$ element-id))
+  (.render component (cdom/get-element element-id))
   component)
 
 (defn clear-tree [element-id]
-  (dom/removeChildren (dom/$ element-id)))
+  (cdom/remove-children element-id))
 
 (defn render-tree [element-id data]
   (let [tree (tree-control)]
@@ -67,12 +55,12 @@
 (defn add-object [node obj]
   (label node obj)
   (let [child (create-child node)]
-    (events/listen node
-                   goog.ui.tree.BaseNode.EventType/BEFORE_EXPAND
-                   #(o/forEach obj
-                               (fn [v k obj]
-                                 (label child k)
-                                 (add-data (create-child child) v))))))
+    (event/listen node
+                goog.ui.tree.BaseNode.EventType/BEFORE_EXPAND
+                #(o/forEach obj
+                            (fn [v k obj]
+                              (label child k)
+                              (add-data (create-child child) v))))))
 
 (defn add-seq [node l]
   (label node l)
@@ -85,7 +73,6 @@
       (array? x)))
 
 (defn add-data [node x]
-  (info "adding " x)
   (let [add-to (cond (map? x) add-map
                      (add-seq? x) add-seq
                      (object? x) add-object
@@ -93,23 +80,4 @@
     (add-to node x)
     node))
 
-(defn do-button-clicked []
-  (clear-tree "display")
-  (let [v (.value (dom/$ "text-input"))
-        r (reader/read-string v)] ;; needs error handling
-    (info v)
-    (render-tree "display" r)))
 
-
-(defn render-sample []
-  (render-tree "display"
-               {:a 1
-                :b [1 2 3]
-                :c #{4 5 6}}))
-
-(defn main []
-  (events/listen (dom/$ "treerize")
-                 "click"
-                 do-button-clicked))
-
-(main)

@@ -15,22 +15,11 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 	<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<!--
-	<link rel="stylesheet" href="reset.css">
-	<link rel="stylesheet" href="style.css">
--->
 	<!--[if lt IE 9]>
 	<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
         <link rel="stylesheet" href="css/demo.css">
         <link rel="stylesheet" href="css/tree.css">
-        <style>
-          #div-console {
-            position: absolute;
-            right: 10px;
-            top: 10px;
-          }
-        </style>
 </head>
   <body>
     <textarea id="text-input"></textarea>
@@ -38,14 +27,7 @@
     <input type="submit" value="Treerize" id="treerize"></input>
     <br/>
     <br/>
-    <div id="div-console"></div>
-    <section id="display"/>
-    <section id="debug"/>
-    <!-- In unoptimized mode, additional script tags are required -->
-    <script type="text/javascript" src="out/goog/base.js"></script>
-    <script type="text/javascript" src="out/treeviewer.js"></script>
-    <script>
-      goog.require('treeviewer.core');
-    </script>
+    <div id="display"/>
+    <script type="text/javascript" src="treeviewer.js"></script>
 </body>
 
